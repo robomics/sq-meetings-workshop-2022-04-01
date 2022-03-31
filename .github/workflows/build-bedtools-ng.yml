@@ -71,6 +71,6 @@ jobs:
           venv/bin/bedtools-ng --help
           venv/bin/bedtools-ng --version
           
-          bedtools-ng count-overlaps  \
-                      data/chroms.bed \
-                      data/grch38_transcripts.bed
+          venv/bin/bedtools-ng count-overlaps  \
+                               data/chroms.bed \
+                               data/grch38_transcripts.bed
