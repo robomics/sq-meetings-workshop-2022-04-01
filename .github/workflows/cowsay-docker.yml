@@ -4,11 +4,22 @@
 name: Cowsay - Docker
 
 on:
+  create:
+    tags:
+      - 'v*.*.*'
+
   push:
     branches: [ main, devel ]
+    paths:
+      - ".github/workflows/cowsay-docker.yml"
+      - "Dockerfile"
+    tags:
+      - 'v*.*.*'
 
   pull_request:
     branches: [ main, devel ]
+      - ".github/workflows/cowsay-docker.yml"
+      - "Dockerfile"
 
 jobs:
   build-docker-image:
