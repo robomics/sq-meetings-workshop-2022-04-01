@@ -59,5 +59,6 @@ jobs:
           bedtools-ng --help
           bedtools-ng --version
           
-          bedtools-ng data/chroms.bed \
+          bedtools-ng count-overlaps  \
+                      data/chroms.bed \
                       data/grch38_transcripts.bed
