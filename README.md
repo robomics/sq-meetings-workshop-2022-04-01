@@ -14,6 +14,26 @@ The code should in principle run on Windows. Nevertheless, a laptop with a UNIX-
 
 Singularity has recently been renamed to Apptainer. First try to install Apptainer and fall back on Singularity if Apptainer is not available for your OS/distribution.
 
+### Installing Docker
+
+If you are running a Linux distribution you can most likely install `Docker` through your system package manager (è.g. `apt`, `dnf`, `pacman`...).
+
+In case your distribution does not package `Docker`, you can try to follow [these](https://docs.docker.com/engine/install/#other-linux-distributions) instructions.
+
+On macOS the instructions vary sligthly depending on whether you device has an Apple Silicon (M1) CPU:
+- Instructions for macOS w/ Intel CPUs - [link](https://docs.docker.com/desktop/mac/install/#mac-with-intel-chip)
+- Instructions for macOS w/ Apple Silicon - [link](https://docs.docker.com/desktop/mac/install/#mac-with-apple-silicon)
+
+Here are the instructions for Windows in case you don't have access to a laptop with Linux/macOS: [link](https://docs.docker.com/desktop/windows/install/)
+If you are running macOS
+
+### Installing Apptainer/Singularity
+Apptainer/Singularity can only run on Linux. If you are using macOS or Windows feel free to skip this section.
+
+Many Linux distributions have a package for Apptainer/Singularity.
+
+In case yours doesn't, you can follow [these](https://github.com/apptainer/apptainer/blob/main/INSTALL.md) instructions to install Apptainer from source.
+
 ### Testing Docker and Apptainer/Singularity
 
 Testing Docker:
