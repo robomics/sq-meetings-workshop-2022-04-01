@@ -3,29 +3,25 @@
 
 FROM ubuntu:20.04 as base
 
-
-RUN apt-get update
-RUN apt-get install -y git                \
-                       python3            \
-                       python3-pip        \
-                       python3-setuptools
+# Disable pip's package cache
+ARG PIP_NO_CACHE_DIR=0
 
 # Copy proj. inside container
 COPY . /tmp/src
 
-RUN pip install '/tmp/src[all]'
-RUN pytest /tmp/src
-
-# Uninstall unneded packages
-RUN pip uninstall -y pytest
-RUN apt-get remove -y python3-pip
-
-# Clear package cache
-RUN rm -rf /root/.cache/pip
-RUN rm -rf /var/lib/apt/lists/*
-
-# Remove source files
-RUN rm -r /tmp/src
+# Install dependencies, then install and test project. Finally remove build depdendencies
+RUN apt-get update \
+&&  apt-get install -y git                \
+                       python3            \
+                       python3-pip        \
+                       python3-setuptools \
+&&  pip install '/tmp/src[all]'           \
+&&  pytest /tmp/src \
+&&  pip uninstall -y pytest \
+&&  apt-get remove -y git                \
+                      python3-pip        \
+                      python3-setuptools \
+&&  rm -rf /var/lib/apt/lists/*
 
 RUN bedtools-ng --help
 RUN bedtools-ng --version
