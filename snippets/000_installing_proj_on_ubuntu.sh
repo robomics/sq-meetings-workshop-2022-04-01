@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Copyright (C) 2022 Roberto Rossini (roberros@uio.no)
+# SPDX-License-Identifier: MIT
+
 set -e
 
 # This script contains the command required to install bedtools-ng on an ubuntu machine
