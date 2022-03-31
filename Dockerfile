@@ -3,7 +3,7 @@
 
 FROM ubuntu:20.04 as base
 
-# Install dependencies
+
 RUN apt-get update
 RUN apt-get install -y git                \
                        python3            \
@@ -13,9 +13,19 @@ RUN apt-get install -y git                \
 # Copy proj. inside container
 COPY . /tmp/src
 
-# Install and test proj.
 RUN pip install '/tmp/src[all]'
 RUN pytest /tmp/src
+
+# Uninstall unneded packages
+RUN pip uninstall -y pytest
+RUN apt-get remove -y python3-pip
+
+# Clear package cache
+RUN rm -rf /root/.cache/pip
+RUN rm -rf /var/lib/apt/lists/*
+
+# Remove source files
+RUN rm -r /tmp/src
 
 RUN bedtools-ng --help
 RUN bedtools-ng --version
