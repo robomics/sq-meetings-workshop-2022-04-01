@@ -6,7 +6,7 @@ name: Build bedtools-ng
 # Events that trigger workflow
 on:
   push:
-    branches: [ main, solutions-007 ]
+    branches: [ main, solutions-008 ]
     # Only files matching the following glob expressions will trigger the workflow
     # (e.g. changes to the README will not trigger the workflow)
     paths:
@@ -18,7 +18,7 @@ on:
       - "setup.*"
 
   pull_request:
-    branches: [ main, solutions-007 ]
+    branches: [ main, solutions-008 ]
     paths:
       - "bedtools_ng/**"
       - "data/**"
@@ -43,11 +43,24 @@ jobs:
           - ubuntu-20.04
           - macos-10.15
           - macos-11
+        python-version:
+          - '3.8'
+          - '3.9'
+          - '3.10'
 
     # Define one of more steps
     steps:
       # Use an action to checkout the current repository
       - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
+
+      - name: Check Python version
+        run: python3 --version
 
       # Dependencies need to be installed in different ways on Ubuntu and macOS
       - name: Install build dependencies - Ubuntu
@@ -78,7 +91,7 @@ jobs:
         with:
           path: venv
           # Notice how each OS gets its own cache!
-          key: venv-cache-${{ matrix.os }}-${{ hashFiles('setup.cfg', 'setup.py', 'pyproject.toml') }}
+          key: venv-cache-${{ matrix.os }}-${{ python-version}}-${{ hashFiles('setup.cfg', 'setup.py', 'pyproject.toml') }}
 
       # Create a new venv only if there wasn't a cache hit
       - name: Create venv
