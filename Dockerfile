@@ -1,32 +1,46 @@
 # Copyright (C) 2022 Roberto Rossini (roberros@uio.no)
 # SPDX-License-Identifier: MIT
 
-FROM ubuntu:20.04 as base
+FROM ubuntu:20.04 as builder
 
-# Disable pip's package cache
-ARG PIP_NO_CACHE_DIR=0
+COPY .           /tmp/src/
 
-# Copy proj. inside container
-COPY . /tmp/src
-
-# Install dependencies, then install and test project. Finally remove build depdendencies
+# Install dependencies
 RUN apt-get update \
 &&  apt-get install -y git                \
                        python3            \
                        python3-pip        \
-                       python3-setuptools \
-&&  pip install '/tmp/src[all]'           \
-&&  pytest /tmp/src \
-&&  pip uninstall -y pytest \
-&&  apt-get remove -y git                \
-                      python3-pip        \
-                      python3-setuptools \
+                       python3-venv       \
+                       python3-setuptools
+
+# Install and test proj.
+RUN pip install '/tmp/src[all]' \
+&&  pytest /tmp/src
+
+# Create venv
+RUN python3 -m venv /opt/bedtools-ng --upgrade \
+&&  /opt/bedtools-ng/bin/pip3 install /tmp/src
+
+# IMPORTANT: New build stage! Switch to new base
+FROM ubuntu:20.04 as base
+
+# Copy venv from previous build stage
+COPY --from=builder /opt/bedtools-ng /opt/bedtools-ng
+
+# Install runtime dependencies
+RUN apt-get update \
+&&  apt-get install -y python3 \
 &&  rm -rf /var/lib/apt/lists/*
 
-RUN bedtools-ng --help
-RUN bedtools-ng --version
+# Add venv bin/ folder to PATH
+# Notice that here we use ENV instead of ARG.
+# Varibles defined with ENV remain available once the container is built
+ENV PATH="/opt/bedtools-ng/bin:$PATH"
 
-ENTRYPOINT ["/usr/local/bin/bedtools-ng"]
+RUN  bedtools-ng --help
+RUN  bedtools-ng --version
+
+ENTRYPOINT ["/opt/venv/bin/bedtools-ng"]
 
 # https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
 LABEL org.opencontainers.image.authors='Roberto Rossini <roberros@uio.no>'
