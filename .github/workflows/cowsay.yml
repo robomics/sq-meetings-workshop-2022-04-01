@@ -1,0 +1,25 @@
+# Copyright (C) 2022 Roberto Rossini (roberros@uio.no)
+# SPDX-License-Identifier: MIT
+
+name: Cowsay
+
+on:
+  push:
+    branches: [ main ]
+
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  run-cowsay:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Install cowsay
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cowsay
+
+      - name: Moo!
+        run: cowsay 'Hi from GHA!'
