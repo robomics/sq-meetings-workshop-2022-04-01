@@ -6,7 +6,7 @@ name: Build bedtools-ng
 # Events that trigger workflow
 on:
   push:
-    branches: [ main, solutions-005 ]
+    branches: [ main, solutions-006 ]
     # Only files matching the following glob expressions will trigger the workflow
     # (e.g. changes to the README will not trigger the workflow)
     paths:
@@ -18,7 +18,7 @@ on:
       - "setup.*"
 
   pull_request:
-    branches: [ main, solutions-005 ]
+    branches: [ main, solutions-006 ]
     paths:
       - "bedtools_ng/**"
       - "data/**"
@@ -48,16 +48,28 @@ jobs:
                                   python3-venv       \
                                   python3-setuptools
 
+      - name: Cache venv
+        id: cache-venv
+        uses: actions/cache@v2
+        with:
+          path: |
+             venv
+          key: venv-cache-${{ hashFiles('setup.cfg', 'setup.py', 'pyproject.toml') }}
+
+      - name: Create venv
+        if: steps.cache-venv.outputs.cache-hit != 'true'
+        run: python3 -m venv ./venv
+
       - name: Install bedtools-ng
-        run: pip install '.[all]'
+        run: venv/bin/pip install '.[all]'
 
       - name: Run unit tests
-        run: pytest .
+        run: venv/bin/pytest .
 
       - name: Run bedtools-ng
         run: |
-          bedtools-ng --help
-          bedtools-ng --version
+          venv/bin/bedtools-ng --help
+          venv/bin/bedtools-ng --version
           
           bedtools-ng count-overlaps  \
                       data/chroms.bed \
