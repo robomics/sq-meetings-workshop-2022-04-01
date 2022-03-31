@@ -48,14 +48,18 @@ jobs:
                                   python3-venv       \
                                   python3-setuptools
 
+      # This will cache the venv to avoid needlessly re-installing the same packages over and over
+      # The cache key changes when any of the setup files change
+      # Notice that we are labelling this step with an ID. This allows us to refer to the output of this
+      # step later on
       - name: Cache venv
         id: cache-venv
         uses: actions/cache@v2
         with:
-          path: |
-             venv
+          path: venv
           key: venv-cache-${{ hashFiles('setup.cfg', 'setup.py', 'pyproject.toml') }}
 
+      # Create a new venv only if there wasn't a cache hit
       - name: Create venv
         if: steps.cache-venv.outputs.cache-hit != 'true'
         run: python3 -m venv ./venv
