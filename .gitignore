@@ -1,0 +1,10 @@
+# Copyright (C) 2022 Roberto Rossini <roberros@uio.no>
+#
+# SPDX-License-Identifier: MIT
+
+.idea/
+__pycache__/
+build/
+*egg-info/
+venv/
+bedtools_ng/version.py
