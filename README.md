@@ -8,6 +8,7 @@
 - A GitHub account (required for the CI part)
 - A text editor
 - Apptainer/Singularity (optional)
+- pipeviewer (pv, optional)
 
 The code in this repository was developed on a Linux machine and should run fine on macOS.
 The code should in principle run on Windows. Nevertheless, a laptop with a UNIX-like os is highly recommended.
