@@ -91,7 +91,7 @@ jobs:
         with:
           path: venv
           # Notice how each OS gets its own cache!
-          key: venv-cache-${{ matrix.os }}-${{ python-version}}-${{ hashFiles('setup.cfg', 'setup.py', 'pyproject.toml') }}
+          key: venv-cache-${{ matrix.os }}-${{ matrix.python-version}}-${{ hashFiles('setup.cfg', 'setup.py', 'pyproject.toml') }}
 
       # Create a new venv only if there wasn't a cache hit
       - name: Create venv
