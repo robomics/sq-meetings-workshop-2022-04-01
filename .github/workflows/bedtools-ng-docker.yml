@@ -1,0 +1,84 @@
+# Copyright (C) 2022 Roberto Rossini (roberros@uio.no)
+# SPDX-License-Identifier: MIT
+
+name: Build bedtools-ng Docker image
+
+on:
+  create:
+    tags:
+      - 'v*.*.*'
+
+  push:
+    branches: [ main, solutions-009 ]
+    paths-ignore:
+      - ".github/workflows/build-bedtools-ng.yml"
+      - ".gitattributes"
+      - "LICENSE"
+      - "README.md"
+
+    tags:
+      - 'v*.*.*'
+
+  pull_request:
+    branches: [ main, solutions-009 ]
+    paths-ignore:
+      - ".github/workflows/build-bedtools-ng.yml"
+      - ".gitattributes"
+      - "LICENSE"
+      - "README.md"
+
+jobs:
+  build-docker-image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      # Collect container metadata from the repository
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v3
+        with:
+          # This bit is important, as it determines where the image is pushed
+          images: ghcr.io/${{ github.repository }}/bedtools-ng
+          # This always tags containers with the latest version
+          flavor: latest=true
+          # This defines few criteria to assign tags to containers
+          # The first rule fires when a tag like v1.2.3 is committed, and will tag
+          # the container as bedtools-ng:1.2.3
+          # The second rule tags the image with the short git tag, e.g. bedtools-ng:sha-53b3c1e
+          # The last rule will tag an image with the branch from which it was generated
+          # e.g. bedtools-ng:solutions-009
+          tags: |
+            type=semver,priority=1000,pattern={{version}}
+            type=sha,priority=900
+            type=ref,priority=700,event=branch
+
+      # Login to GHCR
+      # To login to DockerHub, leave the registry at default and pass your DockerHub user
+      # and application (e.g. using repository secrets)
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Setup build environment
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      # Build image and push to one or more registries unless the event that triggered the workflow
+      # is a pull request
+      - name: Build Docker image and push to registries
+        uses: docker/build-push-action@v2
+        with:
+          push: ${{ github.event_name != 'pull_request' }}
+          # Use GitHub Actions cache to cache Docker layers
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          # Use tags and labels detected with the docker/metadata action
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: BUILDKIT_CONTEXT_KEEP_GIT_DIR=true
+          # Without this variable set to true, buildkit will exclude the .git folder
+          # from the build contexts (even if .git/ is not listed in .dockerignore)
